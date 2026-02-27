@@ -30,7 +30,7 @@ def recevoir_positions():
 @app.route('/positions', methods=['GET'])
 def envoyer_positions():
     global joueurs_positions, derniere_maj
-    if time.time() - derniere_maj > 10:
+    if time.time() - derniere_maj > 5:
         joueurs_positions = []
     return jsonify(joueurs_positions)
 
