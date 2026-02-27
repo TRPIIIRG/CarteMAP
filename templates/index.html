@@ -492,19 +492,39 @@
             });
         }
 
+        const statutColors = {
+            "En position": "#00ff88",
+            "En mouvement": "#ffcc00",
+            "En reconnaissance": "#00aaff",
+            "Besoin de renforts": "#ff8800",
+            "Blessé / CASEVAC": "#ff4444",
+            "Hors combat / KIA": "#444444"
+        };
+
         async function updatePositions() {
             try {
-                const response = await fetch('/positions');
-                const joueurs = await response.json();
-                document.querySelectorAll('.joueur, .label-joueur').forEach(e => e.remove());
+                const [posResponse, statResponse] = await Promise.all([
+                    fetch('/positions'),
+                    fetch('/statut')
+                ]);
+                const joueurs = await posResponse.json();
+                const statuts = await statResponse.json();
+
+                document.querySelectorAll('.joueur, .label-joueur, .statut-badge').forEach(e => e.remove());
                 document.getElementById('nb').innerText = joueurs.length;
+
                 const maintenant = new Date();
                 document.getElementById('maj').innerText = maintenant.toLocaleTimeString();
                 document.getElementById('statut-dot').className = 'online';
                 document.getElementById('statut-texte').innerText = 'ONLINE';
+
                 joueurs.forEach(joueur => {
                     const px = (joueur.x / 4100) * 1438;
                     const py = (1 - joueur.y / 4100) * 1438;
+
+                    const statut = statuts[joueur.name] || "En position";
+                    const couleur = statutColors[statut] || "#00ff88";
+
                     const img = document.createElement('img');
                     img.classList.add('joueur');
                     img.src = '/static/SymboleMSS.png';
@@ -513,9 +533,33 @@
                     img.style.top = py + 'px';
                     img.style.width = '50px';
                     img.style.height = '30px';
+                    img.style.filter = `drop-shadow(0 0 6px ${couleur})`;
                     img.setAttribute('draggable', 'false');
                     img.onclick = () => ouvrirFiche(joueur.name);
                     conteneur.appendChild(img);
+
+                    // Badge statut
+                    const badge = document.createElement('div');
+                    badge.classList.add('statut-badge');
+                    badge.style.cssText = `
+                        position: absolute;
+                        left: ${px}px;
+                        top: ${py - 24}px;
+                        transform: translateX(-50%);
+                        background: ${couleur}22;
+                        border: 1px solid ${couleur};
+                        color: ${couleur};
+                        font-size: 9px;
+                        font-family: 'Share Tech Mono', monospace;
+                        padding: 2px 6px;
+                        border-radius: 3px;
+                        white-space: nowrap;
+                        pointer-events: none;
+                        letter-spacing: 1px;
+                    `;
+                    badge.innerText = statut.toUpperCase();
+                    conteneur.appendChild(badge);
+
                     const label = document.createElement('div');
                     label.classList.add('label-joueur');
                     label.style.left = px + 'px';
@@ -524,6 +568,7 @@
                     label.innerText = joueur.name;
                     conteneur.appendChild(label);
                 });
+
             } catch(e) {
                 document.getElementById('statut-dot').className = 'offline';
                 document.getElementById('statut-texte').innerText = 'OFFLINE';

@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 joueurs_positions = []
 derniere_maj = 0
+statuts_joueurs = {}
 
 def charger_joueurs():
     with open('Joueurs.json', 'r', encoding='utf-8') as f:
@@ -40,6 +41,18 @@ def get_joueur(name):
         if j['name'] == name:
             return jsonify(j)
     return jsonify({"error": "Joueur non trouvé"}), 404
+
+@app.route('/statut', methods=['POST'])
+def set_statut():
+    global statuts_joueurs
+    data = request.json
+    if data and 'name' in data and 'statut' in data:
+        statuts_joueurs[data['name']] = data['statut']
+    return jsonify({"status": "ok"})
+
+@app.route('/statut', methods=['GET'])
+def get_statuts():
+    return jsonify(statuts_joueurs)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
