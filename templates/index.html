@@ -7,7 +7,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
 
         :root {
-            --camo4: #0b1226;
+            --camo4: #0f172a;
             --accent: #334155;
             --text: #a0c8e0;
             --glass: rgba(8, 15, 30, 0.75);
@@ -84,8 +84,9 @@
             width: 8px; height: 8px;
             border-radius: 50%;
             background: gray;
+            box-shadow: 0 0 6px gray;
         }
-        #statut-dot.online { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
+        #statut-dot.online { background: #00ff88; box-shadow: 0 0 8px #00ff88; animation: pulse 2s infinite; }
         #statut-dot.offline { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
 
         @keyframes pulse {
@@ -193,7 +194,6 @@
             width: 80vmin;
             height: 80vmin;
             border: 2px solid var(--border);
-            box-shadow: 0 0 30px rgba(0, 170, 255, 0.15), inset 0 0 20px rgba(0,0,0,0.5);
             overflow: hidden;
             border-radius: 6px;
         }
@@ -222,10 +222,7 @@
             transform: translate(-50%, -50%);
             cursor: pointer;
             transition: filter 0.2s;
-            filter: drop-shadow(0 0 4px rgba(0, 170, 255, 0.6));
         }
-
-        .joueur:hover { filter: drop-shadow(0 0 8px rgba(0, 170, 255, 1)); }
 
         .label-joueur {
             position: absolute;
@@ -238,68 +235,6 @@
         }
 
         .surbrillance { filter: drop-shadow(0 0 12px #fff) brightness(1.5) !important; }
-
-        #panneau-statut {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(8, 15, 30, 0.9);
-            border: 1px solid rgba(0, 170, 255, 0.3);
-            border-radius: 8px;
-            padding: 14px 20px;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: 'Share Tech Mono', monospace;
-            backdrop-filter: blur(10px);
-        }
-
-        #panneau-statut select {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(0, 170, 255, 0.3);
-            border-radius: 4px;
-            color: #00aaff;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
-            padding: 6px 10px;
-            outline: none;
-        }
-
-        #panneau-statut input {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(0, 170, 255, 0.3);
-            border-radius: 4px;
-            color: #fff;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
-            padding: 6px 10px;
-            outline: none;
-            width: 160px;
-        }
-
-        #btn-statut {
-            background: rgba(0, 170, 255, 0.2);
-            border: 1px solid rgba(0, 170, 255, 0.4);
-            border-radius: 4px;
-            color: #00aaff;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 11px;
-            padding: 6px 14px;
-            cursor: pointer;
-            letter-spacing: 1px;
-            transition: background 0.2s;
-        }
-
-        #btn-statut:hover { background: rgba(0, 170, 255, 0.4); }
-
-        #statut-label {
-            font-size: 10px;
-            color: rgba(0, 170, 255, 0.6);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
     </style>
 </head>
 <body>
@@ -500,7 +435,7 @@
                     const px = (joueur.x / 4100) * 1438;
                     const py = (1 - joueur.y / 4100) * 1438;
 
-                    const statut = statuts[joueur.name] || "En position";
+                    const statut = statuts[joueur.name] || null;
                     const couleur = statutColors[statut] || "#00ff88";
 
                     const img = document.createElement('img');
@@ -516,26 +451,28 @@
                     img.onclick = () => ouvrirFiche(joueur.name);
                     conteneur.appendChild(img);
 
-                    const badge = document.createElement('div');
-                    badge.classList.add('statut-badge');
-                    badge.style.cssText = `
-                        position: absolute;
-                        left: ${px}px;
-                        top: ${py - 24}px;
-                        transform: translateX(-50%);
-                        background: ${couleur}22;
-                        border: 1px solid ${couleur};
-                        color: ${couleur};
-                        font-size: 9px;
-                        font-family: 'Share Tech Mono', monospace;
-                        padding: 2px 6px;
-                        border-radius: 3px;
-                        white-space: nowrap;
-                        pointer-events: none;
-                        letter-spacing: 1px;
-                    `;
-                    badge.innerText = statut.toUpperCase();
-                    conteneur.appendChild(badge);
+                    if (statut) {
+                        const badge = document.createElement('div');
+                        badge.classList.add('statut-badge');
+                        badge.style.cssText = `
+                            position: absolute;
+                            left: ${px}px;
+                            top: ${py - 24}px;
+                            transform: translateX(-50%);
+                            background: ${couleur}22;
+                            border: 1px solid ${couleur};
+                            color: ${couleur};
+                            font-size: 9px;
+                            font-family: 'Share Tech Mono', monospace;
+                            padding: 2px 6px;
+                            border-radius: 3px;
+                            white-space: nowrap;
+                            pointer-events: none;
+                            letter-spacing: 1px;
+                        `;
+                        badge.innerText = statut.toUpperCase();
+                        conteneur.appendChild(badge);
+                    }
 
                     const label = document.createElement('div');
                     label.classList.add('label-joueur');
