@@ -298,6 +298,69 @@
 
         .transmission-line.rouge { color: #ff4444; }
         .transmission-line.vert { color: #44ff88; }
+        }
+
+        #panneau-statut {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(8, 15, 30, 0.9);
+            border: 1px solid rgba(0, 170, 255, 0.3);
+            border-radius: 8px;
+            padding: 14px 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Share Tech Mono', monospace;
+            backdrop-filter: blur(10px);
+        }
+
+        #panneau-statut select {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(0, 170, 255, 0.3);
+            border-radius: 4px;
+            color: #00aaff;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            padding: 6px 10px;
+            outline: none;
+        }
+
+        #panneau-statut input {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(0, 170, 255, 0.3);
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            padding: 6px 10px;
+            outline: none;
+            width: 160px;
+        }
+
+        #btn-statut {
+            background: rgba(0, 170, 255, 0.2);
+            border: 1px solid rgba(0, 170, 255, 0.4);
+            border-radius: 4px;
+            color: #00aaff;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            padding: 6px 14px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: background 0.2s;
+        }
+
+        #btn-statut:hover { background: rgba(0, 170, 255, 0.4); }
+
+        #statut-label {
+            font-size: 10px;
+            color: rgba(0, 170, 255, 0.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -656,8 +719,32 @@
         }
         setInterval(ajouterTransmission, 2500);
 
+        async function envoyerStatut() {
+            const name = document.getElementById('mon-nom').value.trim();
+            const statut = document.getElementById('mon-statut').value;
+            if (!name) return;
+            await fetch('/statut', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, statut })
+            });
+        }
+
         setInterval(updatePositions, 3000);
         updatePositions();
     </script>
+    <div id="panneau-statut">
+        <span id="statut-label">▶ MON STATUT</span>
+        <input type="text" id="mon-nom" placeholder="Ton pseudo en jeu..." />
+        <select id="mon-statut">
+            <option>En position</option>
+            <option>En mouvement</option>
+            <option>En reconnaissance</option>
+            <option>Besoin de renforts</option>
+            <option>Blessé / CASEVAC</option>
+            <option>Hors combat / KIA</option>
+        </select>
+        <button id="btn-statut" onclick="envoyerStatut()">✔ Confirmer</button>
+    </div>
 </body>
 </html>
