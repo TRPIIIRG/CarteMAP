@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Carte Reforger</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
+
+        :root {
+            --camo4: #080f18;
+            --accent: #00aaff;
+            --text: #a0c8e0;
+            --glass: rgba(8, 15, 30, 0.75);
+            --border: rgba(0, 170, 255, 0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--camo4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        #header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+        }
+
+        #titre {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(0, 170, 255, 0.4);
+        }
+
+        #titre span {
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-left: 12px;
+            opacity: 0.7;
+        }
+
+        #infos {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--text);
+        }
+
+        .info-block {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .info-label { color: var(--accent); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        .info-value { color: white; font-size: 15px; }
+
+        #statut-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: gray;
+            box-shadow: 0 0 6px gray;
+        }
+        #statut-dot.online { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
+        #statut-dot.offline { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        #recherche {
+            position: fixed;
+            top: 70px;
+            left: 20px;
+            z-index: 999;
+        }
+
+        #recherche input {
+            padding: 8px 14px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            font-size: 13px;
+            width: 220px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            color: var(--text);
+            outline: none;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 1px;
+            transition: border 0.2s;
+        }
+
+        #recherche input:focus { border-color: var(--accent); }
+        #recherche input::placeholder { color: rgba(160, 200, 224, 0.4); }
+
+        #fiche {
+            display: none;
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            color: var(--text);
+            padding: 0;
+            border-radius: 6px;
+            z-index: 1000;
+            width: 280px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        #fiche-header {
+            background: rgba(0, 170, 255, 0.15);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #fiche-nom {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        #fermer {
+            cursor: pointer;
+            color: var(--text);
+            opacity: 0.5;
+            font-size: 18px;
+            transition: opacity 0.2s;
+        }
+        #fermer:hover { opacity: 1; }
+
+        #fiche-body { padding: 16px 18px; }
+
+        .fiche-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 170, 255, 0.1);
+            font-size: 14px;
+        }
+
+        .fiche-row:last-child { border-bottom: none; }
+        .fiche-key { color: var(--accent); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+        .fiche-val { color: white; font-family: 'Share Tech Mono', monospace; font-size: 13px; }
+
+        #fiche-footer {
+            background: rgba(0,0,0,0.3);
+            border-top: 1px solid var(--border);
+            padding: 10px 18px;
+            font-size: 11px;
+            font-family: 'Share Tech Mono', monospace;
+            color: rgba(160, 200, 224, 0.4);
+            letter-spacing: 1px;
+        }
+
+        #wrapper {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vmin;
+            height: 80vmin;
+            border: 2px solid var(--border);
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.15), inset 0 0 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border-radius: 6px;
+        }
+
+        #conteneur {
+            position: absolute;
+            width: 1438px;
+            height: 1438px;
+            transform-origin: top left;
+            cursor: grab;
+        }
+
+        #conteneur.grabbing { cursor: grabbing; }
+
+        #conteneur img.map {
+            width: 100%;
+            height: 100%;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: none;
+        }
+
+        .joueur {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: filter 0.2s;
+            filter: drop-shadow(0 0 4px rgba(0, 170, 255, 0.6));
+        }
+
+        .joueur:hover { filter: drop-shadow(0 0 8px rgba(0, 170, 255, 1)); }
+
+        .label-joueur {
+            position: absolute;
+            color: var(--accent);
+            font-size: 11px;
+            font-family: 'Share Tech Mono', monospace;
+            text-shadow: 0 0 6px rgba(0,0,0,0.9), 1px 1px 2px black;
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 1px;
+        }
+
+        .surbrillance { filter: drop-shadow(0 0 12px #fff) brightness(1.5) !important; }
+
+        #terminal {
+            position: fixed;
+            left: 20px;
+            top: 110px;
+            bottom: 20px;
+            width: 220px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: rgba(0, 170, 255, 0.35);
+            overflow: hidden;
+            pointer-events: none;
+            line-height: 1.6;
+        }
+
+        #panneau-intel {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 260px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: rgba(0, 170, 255, 0.7);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .intel-block {
+            background: rgba(8, 15, 30, 0.8);
+            border: 1px solid rgba(0, 170, 255, 0.2);
+            border-radius: 4px;
+            padding: 14px 16px;
+        }
+
+        #signal-canvas {
+            width: 100%;
+            height: 55px;
+            display: block;
+        }
+
+        .intel-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 12px;
+        }
+
+        .transmission-line {
+            margin: 4px 0;
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .transmission-line.rouge { color: #ff4444; }
+        .transmission-line.vert { color: #44ff88; }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <div id="titre">
+            ⬡ Kunar Province
+            <span>// LIVE TRACKING SYSTEM</span>
+        </div>
+        <div id="infos">
+            <div class="info-block">
+                <div id="statut-dot"></div>
+                <span class="info-label">Status</span>
+                <span class="info-value" id="statut-texte">---</span>
+            </div>
+            <div class="info-block">
+                <span class="info-label">Unités</span>
+                <span class="info-value" id="nb">0</span>
+            </div>
+            <div class="info-block">
+                <span class="info-label">Sync</span>
+                <span class="info-value" id="maj">--:--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="recherche">
+        <input type="text" id="search-input" placeholder="▶ RECHERCHE UNITÉ..." oninput="rechercherJoueur(this.value)" onkeydown="if(event.key==='Enter') zoomSurJoueur(this.value)" />
+    </div>
+
+    <div id="terminal"></div>
+
+    <div id="fiche">
+        <div id="fiche-header">
+            <div id="fiche-nom"></div>
+            <div id="fermer" onclick="fermerFiche()">✕</div>
+        </div>
+        <div id="fiche-body">
+            <div class="fiche-row">
+                <span class="fiche-key">Grade</span>
+                <span class="fiche-val" id="fiche-grade"></span>
+            </div>
+            <div class="fiche-row">
+                <span class="fiche-key">Groupe sanguin</span>
+                <span class="fiche-val" id="fiche-gs"></span>
+            </div>
+            <div class="fiche-row">
+                <span class="fiche-key">Temps de jeu</span>
+                <span class="fiche-val" id="fiche-tps"></span>
+            </div>
+        </div>
+        <div id="fiche-footer">// DONNÉES CLASSIFIÉES — ACCÈS RESTREINT</div>
+    </div>
+
+    <div id="wrapper">
+        <div id="conteneur">
+            <img class="map" src="/static/KunarMAP.png" draggable="false" />
+        </div>
+    </div>
+
+    <div id="panneau-intel">
+        <div class="intel-block">
+            <div class="intel-title">▶ SIGNAL RADIO</div>
+            <canvas id="signal-canvas"></canvas>
+        </div>
+        <div class="intel-block">
+            <div class="intel-title">▶ DONNÉES RÉSEAU</div>
+            <div class="intel-row"><span>PAQUETS REÇUS</span><span id="paquets">0</span></div>
+            <div class="intel-row"><span>DATA TOTAL</span><span id="data-total">0 KB</span></div>
+            <div class="intel-row"><span>LATENCE</span><span id="latence">--ms</span></div>
+        </div>
+        <div class="intel-block">
+            <div class="intel-title">▶ TRANSMISSIONS</div>
+            <div id="transmissions"></div>
+        </div>
+    </div>
+
+    <script>
+        const conteneur = document.getElementById('conteneur');
+        const wrapper = document.getElementById('wrapper');
+
+        const wrapperSize = wrapper.getBoundingClientRect();
+        let scale = wrapperSize.width / 1438;
+        let posX = 0, posY = 0;
+        let isDragging = false;
+        let startX, startY;
+
+        conteneur.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+        const minScale = scale;
+
+        wrapper.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY * -0.001;
+            const newScale = Math.min(Math.max(minScale, scale + delta), 5);
+
+            const rect = wrapper.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            let newPosX = mouseX - (mouseX - posX) * (newScale / scale);
+            let newPosY = mouseY - (mouseY - posY) * (newScale / scale);
+
+            const mapSize = 1438 * newScale;
+            const wrapperW = rect.width;
+            const wrapperH = rect.height;
+
+            newPosX = Math.min(0, Math.max(wrapperW - mapSize, newPosX));
+            newPosY = Math.min(0, Math.max(wrapperH - mapSize, newPosY));
+
+            posX = newPosX;
+            posY = newPosY;
+            scale = newScale;
+            conteneur.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+        }, { passive: false });
+
+        wrapper.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX - posX;
+            startY = e.clientY - posY;
+            conteneur.classList.add('grabbing');
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            let newPosX = e.clientX - startX;
+            let newPosY = e.clientY - startY;
+            const mapSize = 1438 * scale;
+            const wrapperW = wrapper.getBoundingClientRect().width;
+            const wrapperH = wrapper.getBoundingClientRect().height;
+            newPosX = Math.min(0, Math.max(wrapperW - mapSize, newPosX));
+            newPosY = Math.min(0, Math.max(wrapperH - mapSize, newPosY));
+            posX = newPosX;
+            posY = newPosY;
+            conteneur.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            conteneur.classList.remove('grabbing');
+        });
+
+        async function ouvrirFiche(name) {
+            const response = await fetch('/joueur/' + name);
+            const joueur = await response.json();
+            if (joueur.error) return;
+            document.getElementById('fiche-nom').innerText = joueur.prenom + ' ' + joueur.nom;
+            document.getElementById('fiche-grade').innerText = joueur.grade;
+            document.getElementById('fiche-gs').innerText = joueur.groupe_sanguin;
+            document.getElementById('fiche-tps').innerText = joueur.temps_jeu + ' h';
+            document.getElementById('fiche').style.display = 'block';
+        }
+
+        function fermerFiche() {
+            document.getElementById('fiche').style.display = 'none';
+        }
+
+        function rechercherJoueur(query) {
+            document.querySelectorAll('.joueur').forEach(el => {
+                el.classList.remove('surbrillance');
+            });
+        }
+
+        function zoomSurJoueur(query) {
+            if (!query) return;
+            document.querySelectorAll('.joueur').forEach(el => {
+                if (el.title.toLowerCase().includes(query.toLowerCase())) {
+                    el.classList.add('surbrillance');
+                    const px = parseFloat(el.style.left);
+                    const py = parseFloat(el.style.top);
+                    const wrapperW = wrapper.getBoundingClientRect().width;
+                    const wrapperH = wrapper.getBoundingClientRect().height;
+                    const targetScale = 2;
+                    const targetPosX = Math.min(0, Math.max(wrapperW - 1438 * targetScale, (wrapperW / 2) - px * targetScale));
+                    const targetPosY = Math.min(0, Math.max(wrapperH - 1438 * targetScale, (wrapperH / 2) - py * targetScale));
+                    const startScale = scale;
+                    const startPosX = posX;
+                    const startPosY = posY;
+                    const duration = 600;
+                    const startTime = performance.now();
+                    function animate(now) {
+                        const elapsed = now - startTime;
+                        const t = Math.min(elapsed / duration, 1);
+                        const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+                        scale = startScale + (targetScale - startScale) * ease;
+                        posX = startPosX + (targetPosX - startPosX) * ease;
+                        posY = startPosY + (targetPosY - startPosY) * ease;
+                        conteneur.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+                        if (t < 1) requestAnimationFrame(animate);
+                    }
+                    requestAnimationFrame(animate);
+                }
+            });
+        }
+
+        async function updatePositions() {
+            try {
+                const response = await fetch('/positions');
+                const joueurs = await response.json();
+                document.querySelectorAll('.joueur, .label-joueur').forEach(e => e.remove());
+                document.getElementById('nb').innerText = joueurs.length;
+                const maintenant = new Date();
+                document.getElementById('maj').innerText = maintenant.toLocaleTimeString();
+                document.getElementById('statut-dot').className = 'online';
+                document.getElementById('statut-texte').innerText = 'ONLINE';
+                joueurs.forEach(joueur => {
+                    const px = (joueur.x / 4100) * 1438;
+                    const py = (1 - joueur.y / 4100) * 1438;
+                    const img = document.createElement('img');
+                    img.classList.add('joueur');
+                    img.src = '/static/SymboleMSS.png';
+                    img.title = joueur.name;
+                    img.style.left = px + 'px';
+                    img.style.top = py + 'px';
+                    img.style.width = '50px';
+                    img.style.height = '30px';
+                    img.setAttribute('draggable', 'false');
+                    img.onclick = () => ouvrirFiche(joueur.name);
+                    conteneur.appendChild(img);
+                    const label = document.createElement('div');
+                    label.classList.add('label-joueur');
+                    label.style.left = px + 'px';
+                    label.style.top = (py + 20) + 'px';
+                    label.style.transform = 'translateX(-50%)';
+                    label.innerText = joueur.name;
+                    conteneur.appendChild(label);
+                });
+            } catch(e) {
+                document.getElementById('statut-dot').className = 'offline';
+                document.getElementById('statut-texte').innerText = 'OFFLINE';
+            }
+        }
+
+        // Terminal
+        const lignes = [
+            "INIT TRACKING SYSTEM...", "CONNEXION ÉTABLIE", "SCAN RÉSEAU...",
+            "CHIFFREMENT AES-256", "PING 12ms", "GPS SYNC OK",
+            "UNITÉS DÉTECTÉES", "COORDONNÉES REÇUES", "MAJ CARTE...",
+            "FIREWALL ACTIF", "ACCÈS AUTORISÉ", "DONNÉES CLASSIFIÉES",
+            "SCAN SECTEUR NORD", "SCAN SECTEUR SUD", "SIGNAL FORT",
+            "PROTOCOLE MSS v2.4", "LIAISON SATELLITE OK", "CRYPTAGE ACTIF",
+            "0x4F3A2B1C", "0xFF00AA12", "BUFFER OVERFLOW CHECK",
+            "UPTIME: 99.9%", "MÉMOIRE: 42%", "CPU: 18%"
+        ];
+        const terminal = document.getElementById('terminal');
+        let lignesAffichees = [];
+        function ajouterLigne() {
+            const ligne = lignes[Math.floor(Math.random() * lignes.length)];
+            const prefix = Math.random() > 0.5 ? '> ' : '// ';
+            lignesAffichees.push(prefix + ligne);
+            if (lignesAffichees.length > 80) lignesAffichees.shift();
+            terminal.innerHTML = lignesAffichees.join('<br>');
+        }
+        setInterval(ajouterLigne, 300);
+
+        // Signal canvas
+        const canvas = document.getElementById('signal-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 196;
+        canvas.height = 40;
+        let signalData = new Array(98).fill(20);
+        function drawSignal() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            signalData.push(10 + Math.random() * 20);
+            signalData.shift();
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(0, 170, 255, 0.8)';
+            ctx.lineWidth = 1.5;
+            signalData.forEach((v, i) => {
+                i === 0 ? ctx.moveTo(i * 2, canvas.height - v) : ctx.lineTo(i * 2, canvas.height - v);
+            });
+            ctx.stroke();
+        }
+        setInterval(drawSignal, 50);
+
+        // Compteurs réseau
+        let paquets = 0;
+        let dataTotal = 0;
+        function updateCompteurs() {
+            paquets += Math.floor(Math.random() * 5) + 1;
+            dataTotal += Math.random() * 2;
+            document.getElementById('paquets').innerText = paquets.toLocaleString();
+            document.getElementById('data-total').innerText = dataTotal.toFixed(1) + ' KB';
+            document.getElementById('latence').innerText = (8 + Math.floor(Math.random() * 20)) + 'ms';
+        }
+        setInterval(updateCompteurs, 800);
+
+        // Transmissions
+        const messagesIntel = [
+            { texte: "CONTACT ENNEMI SECTEUR C4", type: "rouge" },
+            { texte: "UNITÉ HAMMER-1 EN POSITION", type: "vert" },
+            { texte: "RAVITAILLEMENT EN ROUTE", type: "vert" },
+            { texte: "TIR ENNEMI SIGNALÉ", type: "rouge" },
+            { texte: "CHECKPOINT SÉCURISÉ", type: "vert" },
+            { texte: "MOUVEMENT SUSPECT NORD", type: "rouge" },
+            { texte: "BLESSÉ ÉVACUÉ", type: "vert" },
+            { texte: "IED DÉTECTÉ ROUTE 7", type: "rouge" },
+            { texte: "PÉRIMÈTRE ÉTABLI", type: "vert" },
+            { texte: "DRONE EN PATROUILLE", type: "vert" },
+            { texte: "ACCROCHAGE SECTEUR B2", type: "rouge" },
+            { texte: "RENFORTS DEMANDÉS", type: "rouge" },
+        ];
+        let transmissionsAffichees = [];
+        function ajouterTransmission() {
+            const msg = messagesIntel[Math.floor(Math.random() * messagesIntel.length)];
+            const heure = new Date().toLocaleTimeString();
+            transmissionsAffichees.push({ ...msg, heure });
+            if (transmissionsAffichees.length > 4) transmissionsAffichees.shift();
+            document.getElementById('transmissions').innerHTML = transmissionsAffichees
+                .map(m => `<div class="transmission-line ${m.type}">[${m.heure}] ${m.texte}</div>`)
+                .join('');
+        }
+        setInterval(ajouterTransmission, 2500);
+
+        setInterval(updatePositions, 3000);
+        updatePositions();
+    </script>
+</body>
+</html>

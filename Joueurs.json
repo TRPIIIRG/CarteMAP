@@ -1,0 +1,100 @@
+{
+    "joueurs": [
+        {
+            "name": "ARFALKAN",
+            "prenom": "Luigi",
+            "nom": "Arfalkan",
+            "grade": "Général",
+            "groupe_sanguin": "A POS",
+            "temps_jeu": 0
+        },
+        {
+            "name": "GIOVANNI",
+            "prenom": "Avix",
+            "nom": "Giovanni",
+            "grade": "Soldat",
+            "groupe_sanguin": "O NEG",
+            "temps_jeu": 0
+        },
+        {
+            "name": "CHRI",
+            "prenom": "Chris",
+            "nom": "Chri",
+            "grade": "Soldat",
+            "groupe_sanguin": "B NEG",
+            "temps_jeu": 0
+        },
+        {
+            "name": "PHILLIPS",
+            "prenom": "Westker",
+            "nom": "Phillips",
+            "grade": "Recrue",
+            "groupe_sanguin": "A POS",
+            "temps_jeu": 0
+        },
+        {
+            "name": "BLACK",
+            "prenom": "Jack",
+            "nom": "Black",
+            "grade": "Recrue",
+            "groupe_sanguin": "A NEG",
+            "temps_jeu": 0
+        },
+        {
+            "name": "WINTERS",
+            "prenom": "Joe",
+            "nom": "Winters",
+            "grade": "Soldat",
+            "groupe_sanguin": "B NEG",
+            "temps_jeu": 0
+        },
+        {
+            "name": "KERRY",
+            "prenom": "Ben",
+            "nom": "Kerry",
+            "grade": "Sergent",
+            "groupe_sanguin": "O NEG",
+            "temps_jeu": 0
+        },
+        {
+            "name": "WHITE",
+            "prenom": "Ethan",
+            "nom": "White",
+            "grade": "Commandant",
+            "groupe_sanguin": "A NEG",
+            "temps_jeu": 0
+        },
+        {
+            "name": "LERAT",
+            "prenom": "Thomas",
+            "nom": "Lerat",
+            "grade": "Caporal",
+            "groupe_sanguin": "AB NEG",
+            "temps_jeu": 0
+        },
+        {
+            "name": "PARKER",
+            "prenom": "Soren",
+            "nom": "Parker",
+            "grade": "Capitaine",
+            "groupe_sanguin": "B POS",
+            "temps_jeu": 0
+        },
+        {
+            "name": "GAUTHIER",
+            "prenom": "Yanis",
+            "nom": "Gauthier",
+            "grade": "Colonel",
+            "groupe_sanguin": "O POS",
+            "temps_jeu": 0
+        },
+        {
+            "name": "M-DYST",
+            "prenom": "Louis",
+            "nom": "M-Dyst",
+            "grade": "Major",
+            "groupe_sanguin": "AB POS",
+            "temps_jeu": 0
+        }
+    ]
+}
