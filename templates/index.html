@@ -436,7 +436,7 @@
                     const py = (1 - joueur.y / 4100) * 1438;
 
                     const statut = statuts[joueur.name] || null;
-                    const couleur = statutColors[statut] || "#00ff88";
+                    const couleur = statut ? statutColors[statut] : "#00aaff";
 
                     const img = document.createElement('img');
                     img.classList.add('joueur');
