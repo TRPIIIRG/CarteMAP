@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify, render_template
 import json
+import time
 
 app = Flask(__name__)
 
 joueurs_positions = []
+derniere_maj = 0
 
 def charger_joueurs():
-    with open('joueurs.json', 'r', encoding='utf-8') as f:
+    with open('Joueurs.json', 'r', encoding='utf-8') as f:
         return json.load(f)['joueurs']
 
 @app.route('/')
@@ -15,16 +17,20 @@ def index():
 
 @app.route('/positions', methods=['POST'])
 def recevoir_positions():
-    global joueurs_positions
+    global joueurs_positions, derniere_maj
     data = request.get_data(as_text=True)
     try:
         joueurs_positions = json.loads(data)
     except:
         joueurs_positions = []
+    derniere_maj = time.time()
     return jsonify({"status": "ok"})
 
 @app.route('/positions', methods=['GET'])
 def envoyer_positions():
+    global joueurs_positions, derniere_maj
+    if time.time() - derniere_maj > 10:
+        joueurs_positions = []
     return jsonify(joueurs_positions)
 
 @app.route('/joueur/<name>', methods=['GET'])
